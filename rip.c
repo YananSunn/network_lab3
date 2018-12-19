@@ -18,10 +18,7 @@ char *prtstr[3];
 //封装request包
 void requestpkt_Encapsulate()
 {
-	printf("\n");
-	printf("\n");
-	printf("requestpkt_Encapsulate()\n");
-	printf("----------generate the request packet\n");
+	printf("requestpkt_Encapsulate-------------------------------------------------------\n");
 	send_rip_pkt.ucCommand = 1;
 	send_rip_pkt.ucVersion = 2;
 	send_rip_pkt.usZero    = 0;
@@ -42,10 +39,7 @@ void requestpkt_Encapsulate()
 *******************************************************/
 void rippacket_Receive()
 {
-	printf("\n");
-	printf("\n");
-	printf("rippacket_Receive()\n");
-	printf("----------deal with the packet that has been received\n");
+	printf("rippacket_Receive-------------------------------------------------------\n");
 	int length;
 	unsigned int SockAddrLen = sizeof(struct sockaddr_in);
 	while(1)
@@ -96,10 +90,8 @@ void rippacket_Receive()
 *******************************************************/
 void rippacket_Send(struct in_addr stSourceIp)
 {
-	printf("\n");
-	printf("\n");
-	printf("rippacket_Send()\n");
-	printf("----------send response packet from %s ", pcLocalAddr);
+	printf("rippacket_Send-------------------------------------------------------\n");
+	printf("            Send response packet from %s ", pcLocalAddr);
 	printf("to %s\n", inet_ntoa(stSourceIp));
 	//创建socket
 	int sockdb = socket(AF_INET,SOCK_DGRAM,0);
@@ -209,10 +201,8 @@ void rippacket_Send(struct in_addr stSourceIp)
 *******************************************************/
 void rippacket_Multicast(char *pcLocalAddr,int pkt_len)
 {
-	printf("\n");
-	printf("\n");
-	printf("rippacket_Multicast\n");
-	printf("----------multicast request/update packet from %s\n", pcLocalAddr);
+	printf("rippacket_Multicast-------------------------------------------------------\n");
+	printf("    Multicast request packet from %s\n", pcLocalAddr);
 	sockzb = socket(AF_INET,SOCK_DGRAM,0);
 	if (-1 == sockzb)
 	{
@@ -320,10 +310,7 @@ void request_Handle(struct in_addr stSourceIp)
 *******************************************************/
 void response_Handle(struct in_addr stSourceIp,int length)
 {
-	printf("\n");
-	printf("\n");
-	printf("response_Handle()\n");
-	printf("----------handle the response packet and update the rip route table\n");
+	printf("response_Handle (update the rip route table)--------------------------------------------------\n");
 	printf("This is a response package!----------------------------------------------begin\n");
 	unsigned int metric,tmpmc;
 	int i;
@@ -443,10 +430,6 @@ void response_Handle(struct in_addr stSourceIp,int length)
 *******************************************************/
 void route_SendForward(unsigned int uiCmd,TRtEntry *pstRtEntry)
 {
-	printf("\n");
-	printf("\n");
-	printf("route_SendForward()\n");
-	printf("----------send the change of the rip route table to the forwarding engine\n");
 	unsigned int tmp = pstRtEntry->uiPrefixLen;
 	int j = 0;
 	for(j=0;tmp!=0;j++)
@@ -493,11 +476,7 @@ void route_SendForward(unsigned int uiCmd,TRtEntry *pstRtEntry)
 void rippacket_Update()
 {
 	//遍历rip路由表，封装更新报文
-	printf("\n");
-	printf("\n");
-	printf("rippacket_Update()\n");
-	printf("----------gennerate the rip packet which is going to be multcasted\n");
-	
+	printf("rippacket_Update (gennerate the rip packet which is going to be multcasted)-------------------------------------------------\n");
 	//注意水平分裂算法
 	int sendlen = 0;
 	struct in_addr lcinterfIp,temp;
@@ -530,15 +509,12 @@ void rippacket_Update()
 
 void *update_thread()
 {
-	printf("\n");
-	printf("\n");
-	printf("*update_thread()\n");
 	TRtEntry *del_RouteEntry;
+	printf("*update_thread()--------------------------------------------------\n");
 	while (1)
 	{
 		sleep(5);
-		printf("\n");
-		printf("\n");
+		// 这里的顺序真的对吗？
 		for(cur_RouteEntry=g_pstRouteEntry->pstNext;cur_RouteEntry!=NULL;cur_RouteEntry=cur_RouteEntry->pstNext)
 		{
 			inet_ntop(AF_INET, &cur_RouteEntry->stIpPrefix, prtstr[0], INET_ADDRSTRLEN);
@@ -585,16 +561,12 @@ void *update_thread()
 
 void ripdaemon_Start()
 {
-	printf("\n");
-	printf("\n");
-	printf("ripdaemon_Start()\n");
-	printf("----------set up socket\n");
-	
 	prtstr[0] = (char *)malloc(sizeof(INET_ADDRSTRLEN));
 	prtstr[1] = (char *)malloc(sizeof(INET_ADDRSTRLEN));
 	prtstr[2] = (char *)malloc(sizeof(INET_ADDRSTRLEN));
 //---------------------------------------------------------------------------------------------------------------------
 //单播socket设置
+	printf("ripdaemon_Start-------------------------------------------------\n");
 	sock = socket(AF_INET,SOCK_DGRAM,0);
 	if (-1 == sock)
 	{
@@ -663,7 +635,7 @@ void ripdaemon_Start()
 
 	//封装请求报文，并组播
     requestpkt_Encapsulate();
-    printf("The size of packet is %d\n",lc_ip_size);
+    printf("The size of package is %d\n",lc_ip_size);
     for(int i=0;i<lc_ip_size;i++)
     {
     	rippacket_Multicast(pcLocalAddr[i],1);
@@ -683,10 +655,7 @@ void ripdaemon_Start()
 
 void routentry_Insert()
 {
-	printf("\n");
-	printf("\n");
-	printf("routentry_Insert()\n");
-	printf("----------insert the local interface to the rip route table\n");
+	printf("routentry_Insert-------------------------------------------------\n");
 	struct in_addr tmp_addr,tmp_addr2;
 	int j = 0;
 	unsigned int tmp;
@@ -719,10 +688,7 @@ void routentry_Insert()
 
 void localinterf_GetInfo()
 {
-	printf("\n");
-	printf("\n");
-	printf("localinterf_GetInfo()\n");
-	printf("----------get local info\n");
+	printf("localinterf_GetInfo-------------------------------------------------\n");
 	struct ifaddrs *pstIpAddrStruct = NULL;
 	struct ifaddrs *pstIpAddrStCur  = NULL;
 	void *pAddrPtr=NULL;
@@ -778,4 +744,5 @@ int main(int argc,char* argv[])
 	ripdaemon_Start();
 	return 0;
 }
+
 
